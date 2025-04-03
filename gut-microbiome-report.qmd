@@ -1,0 +1,563 @@
+---
+format: html
+editor: visual
+---
+
+# Material and methods
+## Experimental design
+<p style="text-align: justify;">
+Eighty-eight female C57BL/6 mice were obtained from the Stolbovaya Branch of the Scientific Center of Biomedical Technologies (FMBA, Russia) and the Rappolovo Laboratory Animal Nursery (NRC Kurchatov Institute, Russia). All animals underwent a 14-day quarantine period prior to experimentation. The mice were housed in standard cages with seven animals per cage under controlled environmental conditions, maintaining temperature at 20-23°C, humidity at 60-65%, with natural light cycles and forced ventilation. Sterilized wood shavings served as bedding material, and animals had ad libitum access to water and certified commercial feed ("Chara" briquettes). Veterinary certification confirmed the health status of all subjects. The experimental design involved random allocation of mice into three groups: the melanoma control group (M) receiving B16-F1 cell implantation, the M_BIF group receiving both melanoma implantation and daily *Bifidobacterium adolescentis* 150 supplementation, and the M_LAC group receiving melanoma implantation with daily *Lactobacillus rhamnosus* K32 supplementation. The study was conducted in three experimental replicates, with the first replicate comparing M and M_LAC groups, the second comparing M and M_BIF groups, and the third including all three groups (M, M_BIF, and M_LAC). For bacterial supplementation, lyophilized *B. adolescentis* 150 and *L. rhamnosus* K32 strains were reconstituted in 5 mL of sterile phosphate-buffered saline (PBS), with fresh solutions prepared daily. Experimental groups received 500 μL of the respective bacterial suspension administered via intragastric gavage each morning on weekdays, beginning two weeks prior to tumor inoculation and continuing throughout the study duration. Control animals received equivalent volumes of sterile PBS. Melanoma was induced through subcutaneous injection of B16-F1 cells. Tumor growth was monitored by measuring dimensions three times weekly, with volume calculated using the formula: length × width × 0.5. The study continued until experimental endpoints were reached, defined as either natural death or scheduled termination. Biological samples were collected at predetermined intervals. Fecal specimens were obtained under sterile conditions on days 1, 4, 8, 11, 15, 18, and 22 post-inoculation. Tumor tissues from surviving animals were harvested at study termination, immediately placed in RNAlater Stabilization Solution (Thermo Fisher Scientific, USA), and stored at -80°C for subsequent transcriptomic analysis.
+<p>
+
+## Cultivation and lyophilization of bacterial cultures
+<p style="text-align: justify;">
+The *L. rhamnosus* K32 strain (GenBank accession JNNV00000000) was cultured in Lactobacillus MRS Broth medium (HiMedia, India) at 37°C under anaerobic conditions using a HiAnaerobic System Mark III with AnaeroHiGas Pack 3.5L (HiMedia, India). Similarly, the *B. adolescentis* 150 strain (GenBank accession LBHQ00000000) was cultivated in modified MRS Broth supplemented with 0.5% cysteine under identical temperature and anaerobic conditions. For long-term preservation, bacterial cultures underwent lyophilization following standardized protocols. Initial processing involved washing the biomass with sterile sodium phosphate buffer to remove residual culture medium. To enhance cellular stability during storage, we incorporated a cryoprotective mixture containing 10% sucrose and 1% gelatin, added at a 1:1 ratio to the original culture volume. The prepared bacterial suspensions were aliquoted into sterile 5 ml glass vials. The lyophilization protocol consisted of three critical phases: primary freezing at -20°C, followed by lyophilic drying for 50±6 hours at -50 to -54°C under vacuum (0.420 mBar). This process was conducted using specialized lyophilization equipment. The lyophilized bacterial cultures were provided by our collaborators at the N.I. Vavilov Institute of General Genetics, Russian Academy of Sciences.
+<p>
+
+## Statistical evaluation
+<p style="text-align: justify;">
+The assessment of melanoma growth rates was performed using a linear mixed-effects model implemented through the lmer function in the lmerTest v3.1.3 package. This analytical approach was selected to account for both fixed effects (experimental treatments) and random effects (individual variation between mice and batch effect linked to experimental replicates). Model assumptions were verified through residual diagnostics, including tests for normality using Shapiro-Wilk test by function shapiro.test. Post-hoc comparisons between experimental groups were conducted using Tukey's honestly significant difference (HSD) tests with appropriate corrections for multiple comparisons by Bonferroni correction for multiple testing using glht function from multcomp v1.4.28 library. For visualization ggplot2 v3.5.1 package was used. The R v4.4.2 language was used to perform all calculations.
+<p>
+
+## Microbiome diversity analysis
+#### DNA extraction and sequencing
+<p style="text-align: justify;">
+Nucleic acid extraction was performed using the MagMAX Microbiome Ultra Nucleic Acid Isolation Kit (Thermo Fisher Scientific, USA). Stool samples were suspended in 700 µL of phosphate-buffered saline (PBS) and homogenized using MagNA Lyser Green Beads (Roche, Switzerland) in a MagNA Lyser instrument (Roche, Switzerland). Following homogenization, samples were centrifuged at 9,000 × g for 1 minute, after which the supernatant was processed according to the manufacturer's protocol. DNA concentration was quantified using a Qubit 4 fluorometer (Thermo Fisher Scientific, USA) with the Quant-iT dsDNA BR Assay Kit (Thermo Fisher Scientific, USA). For 16S rRNA gene amplification, 1-5 ng of extracted DNA served as template using universal primers 27F (5'-AGAGTTTGATYMTGGCTCAG-3') and 1492R (5'-GGTTACCTTGTTAYGACTT-3') (Eurogen, Russia). PCR reactions were performed in 25 µL volumes with the Tersus Plus PCR kit (Eurogen, Russia) under the following conditions: initial denaturation at 95°C for 2 minutes; 27 cycles of 95°C for 1 minute, 60°C for 1 minute, and 72°C for 3 minutes; followed by final extension at 72°C for 2 minutes. PCR products were verified by electrophoresis in 1.5% agarose gels and purified using KAPA HyperPure Beads (Roche, Switzerland). Library preparation followed the ligation sequencing protocol with modifications. Amplicons were end-repaired and dA-tailed using the NEBNext Ultra II End Repair/dA-Tailing Module (NEB, USA). Barcode ligation was performed with the Native Barcoding Kit 96 (SQK-NBD109.96; Oxford Nanopore Technologies, UK) using Blunt/TA Ligase Master Mix (NEB, USA), followed by purification with KAPA Pure Beads (Roche, Switzerland). Library concentrations were determined using the Quant-iT dsDNA Assay Kit, High Sensitivity (Thermo Fisher Scientific), and samples were pooled in equimolar ratios. Final adapter ligation employed Adapter Mix II Expansion (Oxford Nanopore Technologies, UK) with the NEBNext Quick Ligation Module (NEB, USA). For nanopore sequencing, 12 µL of the prepared library was combined with 37.5 µL Sequencing Buffer and 25.5 µL Loading Beads, then loaded onto an R9.4.1 flow cell (FLO-MIN106; Oxford Nanopore Technologies). Sequencing was performed on a MinION Mk1B platform using MinKNOW software version 22.12.7 (Oxford Nanopore Technologies, UK) for data acquisition.
+<p>
+
+#### Bioinformatics analysis
+<p style="text-align: justify;">
+Raw sequencing data were processed using Porechop v0.2.4 for adapter removal (default parameters). Quality filtering was performed with Chopper v0.6.0 \[De Coster et al., 2023\], retaining reads between 1,000–2,000 bp with minimum Phred scores ≥10. Taxonomic classification was conducted via the Emu v3.4.5 pipeline \[Curry et al., 2022\] against the GTDB r202 database \[Parks et al., 2022\], with read statistics generated by NanoStat v1.6.0 \[De Coster et al., 2023\]. Microbial diversity analysis was performed in R v4.4.2. Alpha-diversity (Shannon index) was computed using the diversity function (vegan v2.6.10), with statistical significance assessed via a linear mixed-effects model (lmer, lmerTest v3.1.3) followed by post-hoc Tukey HSD tests (glht, multcomp v1.4.28), applying Benjamini-Hochberg correction. Beta-diversity was evaluated using Bray-Curtis dissimilarity, visualized via non-metric multidimensional scaling (metaMDS, vegan) and tested for group differences using PERMANOVA (adonis2, vegan). Differential abundance analysis employed MaAsLin2 v1.16.0 \[Mallick et al., 2021\]. All visualizations were generated with ggplot2 v3.5.1.
+<p>
+
+```{mermaid}
+flowchart LR
+    A[("raw reads")] --> B{"nanostat"}
+    A --> C{"porechop"}
+    C --> D{"chopper"}
+    D --> B
+    D --> E{emu}
+    E --> F{vegan}
+    E --> G{maaslin}
+    B --> I{multiQC}
+    F --> M{lmer}
+    F --> N{nMDS}
+    F --> O{PERMANOVA}
+```
+
+## Ethical approval
+<p style="text-align: justify;">
+All experimental procedures were conducted in strict adherence to the GSK Policy on the Care, Welfare, and Treatment of Laboratory Animals. The study protocol received full ethical approval from the Institutional Animal Care and Use Committee of the Burnasyan Federal Medical Biophysical Center (Federal Medical Biological Agency, Russia) as well as the Committee on Scientific Research and Academic Ethics of Inner Mongolia Agricultural University (Approval No. 2020-049). The research was performed in compliance with both international standards (ARRIVE 2.0 guidelines) and applicable national regulations governing biomedical research involving animal models.
+<p>
+
+## References:
+1)  [De Coster, Wouter, and Rosa Rademakers. "NanoPack2: population-scale evaluation of long-read sequencing data." Bioinformatics 39.5 (2023): btad311.](https://academic.oup.com/bioinformatics/article/39/5/btad311/7160911?login=true)
+2)  [Curry, Kristen D., et al. "Emu: species-level microbial community profiling of full-length 16S rRNA Oxford Nanopore sequencing data." Nature methods 19.7 (2022): 845-853.](https://www.nature.com/articles/s41592-022-01520-4)
+3)  [Parks, Donovan H., et al. "GTDB: an ongoing census of bacterial and archaeal diversity through a phylogenetically consistent, rank normalized and complete genome-based taxonomy." Nucleic acids research 50.D1 (2022): D785-D794.](https://academic.oup.com/nar/article/50/D1/D785/6370255?login=true)
+4)  [Mallick, Himel, et al. "Multivariable association discovery in population-scale meta-omics studies." PLoS computational biology 17.11 (2021): e1009442.](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009442)
+
+```{r}
+#| include: false
+library(ggplot2)
+library(ggpubr)
+library(ggrepel)
+library(RColorBrewer)
+library(lmerTest)
+library(multcomp)
+
+library(phyloseq)
+library(microViz)
+library(vegan)
+library(stringr)
+
+library(DT)
+library(downloadthis)
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+tumor.df <- read.csv("data/tumor.tsv", sep = "\t")
+
+otu_table <- read.csv("data/otu_table.tsv", sep = "\t")
+
+meta_data <- read.csv("data/metadata.tsv", sep = "\t")
+
+taxonomy <- read.csv("data/taxonomy.tsv", sep = "\t")
+taxonomy$phylum <- sapply(str_split(taxonomy$phylum, "_"), function(x) x[1])
+
+statistic <- read.csv("data/statistic.tsv", sep = "\t")
+
+res <- read.csv("data/maaslin2-1.tsv", sep = "\t")
+res_2 <- read.csv("data/maaslin2-2.tsv", sep = "\t")
+```
+
+# Results
+## Experimental design and samples overwiev
+<p style="text-align: justify;">
+The analysis included a total of 88 mice representing three experimental groups: 1) melanoma (n = 39); 2) melanoma supplemented with *Bifidobacterium adolescentis* 150 (n = 27); and 3) melanoma supplemented with *Lacticaseibacillus rhamnosus* K32 (n = 22). The study was conducted in three sequential replicates: the first replicate comprised only the melanoma and *L. rhamnosus*-supplemented groups (n = 24), the second replicate comprised only the melanoma and *B. adolescentis*-supplemented groups (n = 34), while the third replicate incorporated all three experimental conditions (n = 30). For clarity in data interpretation, we introduced the following standardized codings:
+<p>
+
+Experimental groups:
+
+1)  Melanoma --\> `M`.
+2)  Melanoma with *B. adolescentis* 150 supplement --\> `M_BIF`.
+3)  Melanoma with *L. rhamnosus* K32 supplement --\> `M_LAC`.
+
+Experimental batch:
+
+1)  First experiment --\> `batch_1`.
+2)  Second experiment --\> `batch_2`.
+3)  Third experiment --\> `batch_3`.
+
+The experimental data for all mice included to study presented in Table 1.
+
+```{r}
+#| echo: false
+datatable(tumor.df, 
+          caption = "Table 1. Experimantal mice metadata.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+## The influence of *L. rhamnosus* K32 and *B. adolescentis* 150 supplementation on B16-F1 melanoma growth
+<p style="text-align: justify;">
+At the initial study phase, we evaluated differences in tumor growth between experimental groups. The data revealed that mice in the M_BIF group showed a statistically significant increase in tumor growth compared to both the M group (adj. p = 0.02) and the M_LAC group (adj. p = 0.0007). In contrast, no significant difference was observed between the M and M_LAC groups (p = 0.40). Individual tumor growth curves for each mouse, stratified by experimental group and replicate, are presented in Figure 1.
+<p>
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+tumor_plot <- ggplot(tumor.df[tumor.df$time_point < 18,])+
+    geom_line(mapping = aes(time_point, tumor_size, group = subject_id, col = group))+
+    facet_wrap(~batch+group, nrow = 1)+
+    theme_classic()+
+    scale_color_manual(values = brewer.pal(n = 3, name = "Set1"))+
+    theme(legend.position = "none")+
+    xlab("Days post-tumor injection")+
+    ylab("Tumor size, cm²")
+```
+
+```{r}
+#| include: false
+fm <- lmerTest::lmer(tumor_size ~ group + (1|batch) + (1|subject_id), data=tumor.df)
+```
+
+```{r fig.width=10, fig.height=3.5}
+#| echo: false
+download_this(
+  tumor_plot,
+  output_name = "tumor_plot",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.width=10, fig.height=3.5}
+#| echo: false
+#| fig-cap: Figure 1. Tumor growth rates per time points stratified by experimental group and replicate.
+tumor_plot
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+summary(glht(fm, linfct = mcp(group = "Tukey")), test = adjusted("bonferroni"))
+```
+
+## Microbiome diversity analysis
+#### 16S rRNA sequencing fecal samples overwiev
+<p style="text-align: justify;">
+The next phase of the analysis focused on assessing microbial diversity in the experimental mice. Fecal samples were pooled within each experimental group and subjected to 16S rRNA sequencing. A total of 77 samples were analyzed, representing three experimental groups: the M group (melanoma-only controls; n = 35), the M_BIF group (melanoma supplemented with *B. adolescentis* 150; n = 21), and the M_LAC group (melanoma supplemented with *L. rhamnosus* K32; n = 21). The study was conducted in three sequential replicates to minimize batch effects. The first replicate included only the melanoma and *L. rhamnosus*-supplemented groups (batch_1; n = 28). The second replicate incorporated the melanoma and *B. adolescentis*-supplemented groups (batch_2; n = 28), while the third replicate included all three experimental conditions (n = 21). Detailed sample metadata are provided in Table 2.
+<p>
+
+```{r}
+#| include: false
+meta_data_d <- cbind(sampleid = rownames(meta_data), meta_data)
+rownames(meta_data_d) <- 1:nrow(meta_data_d)
+meta_data_d <- meta_data_d[order(meta_data_d$group, decreasing = F),]
+
+statistic_d <- cbind(sampleid = rownames(statistic), statistic)
+rownames(statistic_d) <- 1:nrow(statistic_d)
+colnames(statistic_d)[-1] <- c("n_reads", "length_mean", "length_stdev", "perc_filtered", "batch")
+statistic_d$batch <- paste0("batch_", statistic_d$batch)
+statistic_d <- merge(meta_data_d[-4], statistic_d, by = 1)
+statistic_d <- statistic_d[order(statistic_d$group),]
+
+otu_table_d <- as.data.frame(t(otu_table))
+otu_table_d <- cbind(taxid = rownames(otu_table_d), otu_table_d)
+
+tax_d <- apply(taxonomy[-1], 1, function(x) paste(x, collapse = "|"))
+names(tax_d) <- NULL
+
+otu_table_d <- merge(data.frame(taxid = rownames(taxonomy), taxonomy = tax_d), otu_table_d, by = 1)
+otu_table_d <- otu_table_d[match(colnames(otu_table), otu_table_d$taxid),]
+rownames(otu_table_d) <- 1:nrow(otu_table_d)
+```
+
+```{r}
+#| echo: false
+datatable(meta_data_d, 
+          caption = "Table 2. 16S rRNA samples metadata.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+#### Quality control
+<p style="text-align: justify;">
+After quality filtering with porechop and chopper, sequencing quality metrics were aggregated and summarized using `MultiQC` based on `FastQC` reports. As shown in Figure 1, the `MultiQC` quality profile demonstrated that the sequencing data maintained satisfactory overall quality. Following quality control, approximately 1,909,224 reads (mean ± SD: 24,795 ± 13,620 reads per sample) were retained for downstream analysis, with an average of 37 ± 17% of reads per sample being removed during filtering (see Table 2 for detailed statistics). Microbial genus abundance was quantified using the `Emu` pipeline with the `GTDB r202` database. The final genus abundance data are presented in Table 4. Visualization of genus distribution cross experimental groups and replicates presented in Figure 2.
+<p>
+
+[MultiQC full report](multiqc_report.html)
+
+![Figure 2. Quality values across experimental samples.](figures/nanostat_quality_dist.svg)
+
+```{r}
+#| echo: false
+datatable(statistic_d, 
+          caption = "Table 3. Quality filtering statistic.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+```{r}
+#| echo: false
+datatable(otu_table_d[-1], 
+          caption = "Table 4. Genus abundance table.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+```{r}
+#| include: false
+phy_obj_emu <- phyloseq(otu_table(otu_table, taxa_are_rows=FALSE),
+                         sample_data(meta_data),
+                         tax_table(as.matrix(taxonomy)))
+
+phy_obj_100 <- transform_sample_counts(phy_obj_emu, function(x) 100 * x/sum(x))
+
+genus_barplot <- phy_obj_100 %>% comp_barplot("genus", n_taxa = 10, merge_other = FALSE, label = NULL)+
+    facet_wrap(vars(group, batch), scales = "free", nrow = 1)+
+    theme_bw()+
+    theme(legend.position = "bottom")
+```
+
+```{r fig.width=15, fig.height=5}
+#| echo: false
+download_this(
+  genus_barplot,
+  output_name = "genus_barplot",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.width=15, fig.height=5}
+#| echo: false
+#| fig-cap: Figure 2. Genus distribution per experimental samples stratified by group and replicate.
+genus_barplot
+```
+
+#### Alpha diversity
+<p style="text-align: justify;">
+Alpha diversity was assessed using the Shannon index, calculated with the `diversity` function from the R `vegan` package. Statistical analysis revealed a significant reduction in Shannon index values in the M_LAC group compared to the M group (adj. p = 0.03). No other inter group differences in alpha diversity were observed. Complete results are presented in Table 5 and visualized in Figure 3.
+<p>
+
+```{r}
+#| include: false
+shannon <- diversity(otu_table, index = "shannon")
+shannon <- as.data.frame(shannon)
+shannon <- cbind(rownames(shannon), shannon)
+
+alpha.df <- merge(cbind(sampleid = rownames(meta_data), meta_data), shannon, by = 1)
+alpha.df <- alpha.df[order(alpha.df$group),]
+
+shannon_boxplot <- ggplot(alpha.df, aes(group, shannon, fill = group))+
+    geom_boxplot()+
+    facet_wrap(~batch)+
+    theme_bw()+
+    theme(legend.position = "none")+
+    scale_fill_brewer(palette = "Set1")
+
+lmer.shannon <- lmer(shannon ~ group + (1|batch), data=alpha.df)
+```
+
+```{r}
+#| echo: false
+datatable(alpha.df, 
+          caption = "Table 5. Alpha-diversity table.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+```{r fig.width=7, fig.height=3}
+#| echo: false
+download_this(
+  shannon_boxplot,
+  output_name = "shannon_boxplot",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.width=7, fig.height=3}
+#| echo: false
+#| fig-cap: Figure 3. Shannon diversity index distribution stratified by group and replicate.
+shannon_boxplot
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+summary(glht(lmer.shannon, linfct = mcp(group = "Tukey")), test = adjusted("bonferroni"))
+```
+
+#### Beta diversity
+<p style="text-align: justify;">
+Beta diversity was assessed using Bray-Curtis dissimilarity. The resulting community composition patterns were visualized through non-metric multidimensional scaling (NMDS), as shown in Figure 4, with corresponding sample metadata presented in Table 6. Permutational multivariate analysis of variance (PERMANOVA) revealed statistically significant associations between microbial community structure and batch effects (p \< 0.05), but not with experimental groups.
+<p>
+
+```{r}
+#| include: false
+mds <- metaMDS(otu_table)
+
+mds.points <- as.data.frame(mds$points)
+mds.points <- merge(cbind(sampleid = rownames(meta_data), meta_data), 
+                    cbind(rownames(mds.points), mds.points), 
+                    by = 1)
+mds.points <- mds.points[order(mds.points$group),]
+
+mds_plot <- ggplot(mds.points, aes(MDS1, MDS2, col = group, shape = batch))+
+    geom_point(size = 3)+
+    theme_bw()+
+    scale_color_brewer(palette = "Set1")
+```
+
+```{r}
+#| echo: false
+datatable(mds.points, 
+          caption = "Table 6. MDS data table.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+download_this(
+  mds_plot,
+  output_name = "mds_plot",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+#| fig-cap: Figure 4. Bi-dimentional visualization of microbiome strcutrure at genus level using non-metric multidimentional scaling and Bray-Curtis dissimilarity.
+mds_plot
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+adonis2(otu_table ~ batch + group, data = meta_data, permutations = 9999, by = "margin")
+```
+
+#### Differential abundance testing
+<p style="text-align: justify;">
+Differential abundance analysis was performed using `MaAsLin2` with default parameters. Compared to the M group (melanoma-only controls), the M_BIF group showed significant upregulation of CAG-594, *Caprobacter*, *Lachnotalea*, and *Klebsiella* genera, while *Muricomes*, *CAG-180*, *Intestinimonas*, *Holdemania*, and *Zag111* were downregulated. In the M_LAC group, *Klebsiella* was upregulated relative to controls, while multiple genera including *CAG-594*, *Lawsonibacter*, *UBA7182*, *Blautia*, *UBA3282*, *Paramuribaculum*, *Phocaeicola*, *Dorea_B*, *Flavonifractor*, *Dubosiella*, *Mailhella*, *UMGS1872*, *UBA3263*, *Lachnoclostridium*, and *UBA7057* were downregulated. Direct comparison between M_BIF and M_LAC groups revealed distinct microbial signatures: *CAG-594*, *Blautia*, *Paramuribaculum*, *UBA7057*, and *Marseille-P3106* were associated with M_BIF, whereas *Akkermansia*, *CAG-180*, and *Zag111* were linked to M_LAC. Complete results are presented in Tables 7–9 and Figures 5–7.
+<p>
+
+```{r}
+#| include: false
+res <- res[res$qval < 0.25,]
+
+res.df <- merge(cbind(taxid = rownames(taxonomy), taxonomy), res, by = 1)
+res.df <- res.df[order(res.df$coef, decreasing = T),]
+
+res.df_BIF <- res.df[res.df$value == "M_BIF",]
+res.df_BIF <- res.df_BIF[order(res.df_BIF$coef, decreasing = T),]
+rownames(res.df_BIF) <- 1:nrow(res.df_BIF)
+
+res.df_LAC <- res.df[res.df$value == "M_LAC",]
+res.df_LAC <- res.df_LAC[order(res.df_LAC$coef, decreasing = T),]
+rownames(res.df_LAC) <- 1:nrow(res.df_LAC)
+
+res_2 <- res_2[res_2$qval < 0.25,]
+res_2 <- res_2[res_2$value != "M",]
+
+res_2.df <- merge(cbind(taxid = rownames(taxonomy), taxonomy), res_2, by = 1)
+res_2.df <- res_2.df[order(res_2.df$coef, decreasing = T),]
+rownames(res_2.df) <- 1:nrow(res_2.df)
+
+volcano_BIF <- ggplot(res.df_BIF, aes(x = coef, y = -log10(qval), label = genus)) +
+    geom_point(alpha = 0.6, size = 3)+
+    geom_text_repel(
+        data = res.df_BIF,
+        aes(label = genus),
+        box.padding = 0.5,
+        max.overlaps = Inf,
+        size = 4,
+        color = "black"
+    ) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "red")+
+    labs(
+        x = "Maaslin2 coef",
+        y = "-log10(q-value)"
+    ) +
+    theme_classic() +
+    theme(
+        legend.position = "bottom",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        panel.grid.major = element_line(color = "grey90")
+    )
+
+volcano_LAC <- ggplot(res.df_LAC, aes(x = coef, y = -log10(qval), label = genus)) +
+    geom_point(alpha = 0.6, size = 3)+
+    geom_text_repel(
+        data = res.df_LAC,
+        aes(label = genus),
+        box.padding = 0.5,
+        max.overlaps = Inf,
+        size = 4,
+        color = "black"
+    ) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "red")+
+    labs(
+        x = "Maaslin2 coef",
+        y = "-log10(q-value)"
+    ) +
+    theme_classic() +
+    theme(
+        legend.position = "bottom",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        panel.grid.major = element_line(color = "grey90")
+    )
+
+volcano_BIF_LAC <- ggplot(res_2.df, aes(x = coef, y = -log10(qval), label = genus)) +
+    geom_point(alpha = 0.6, size = 3)+
+    geom_text_repel(
+        data = res_2.df,
+        aes(label = genus),
+        box.padding = 0.5,
+        max.overlaps = Inf,
+        size = 4,
+        color = "black"
+    ) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "red")+
+    labs(
+        x = "Maaslin2 coef",
+        y = "-log10(q-value)"
+    ) +
+    theme_classic() +
+    theme(
+        legend.position = "bottom",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        panel.grid.major = element_line(color = "grey90")
+    )
+```
+
+##### M_BIF vs M
+```{r}
+#| echo: false
+datatable(res.df_BIF, 
+          caption = "Table7. Differences between M_BIF and M groups.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+download_this(
+  volcano_BIF,
+  output_name = "volcano_BIF",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+#| fig-cap: Figure 5. Differences between M_BIF and M groups.
+volcano_BIF
+```
+
+##### M_LAC vs M
+```{r}
+#| echo: false
+datatable(res.df_LAC, 
+          caption = "Table 8. Differences between M_LAC and M groups.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+download_this(
+  volcano_LAC,
+  output_name = "volcano_LAC",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+#| fig-cap: Figure 6. Differences between M_LAC and M groups.
+volcano_LAC
+```
+
+##### M_BIF vs M_LAC
+```{r}
+#| echo: false
+datatable(res_2.df, 
+          caption = "Table 9. Differences between M_BIF and M_LAC groups.",
+          style = "bootstrap5", 
+          extensions = 'Buttons', 
+          options = list(dom = 'lBfrtip',
+                         buttons = c('csv', 'excel')))
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+download_this(
+  volcano_BIF_LAC,
+  output_name = "volcano_BIF_LAC",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.width=6, fig.height=5}
+#| echo: false
+#| fig-cap: Figure 7. Differences between M_BIF and M_LAC groups.
+volcano_BIF_LAC
+```
