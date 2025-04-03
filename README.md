@@ -8,7 +8,7 @@ This repository hosts the complete bioinformatics workflow and analytical result
 
 ## Key findings
 - *B. adolescentis* 150 accelerated tumor growth, linked to *Klebsiella* enrichment.
-- *L. rhamnosus* K32 increased *Klebsiella* abundance and reduced microbiome diversity, yet had no significant impact on tumor progression.
+- *L. rhamnosus* K32 also increased *Klebsiella* abundance and reduced microbiome diversity, yet had no significant impact on tumor progression.
 
 ## Repository structure
 ```
