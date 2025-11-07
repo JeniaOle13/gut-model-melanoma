@@ -19,8 +19,6 @@ The *L. rhamnosus* K32 strain (GenBank accession JNNV00000000) was cultured in L
 The assessment of melanoma growth rates was performed using a linear mixed-effects model implemented through the lmer function in the lmerTest v3.1.3 package. This analytical approach was selected to account for both fixed effects (experimental treatments) and random effects (individual variation between mice and batch effect linked to experimental replicates). Model assumptions were verified through residual diagnostics, including tests for normality using Shapiro-Wilk test by function shapiro.test. Post-hoc comparisons between experimental groups were conducted using Tukey's honestly significant difference (HSD) tests with appropriate corrections for multiple comparisons by Bonferroni correction for multiple testing using glht function from multcomp v1.4.28 library. For visualization ggplot2 v3.5.1 package was used. The R v4.4.2 language was used to perform all calculations.
 <p>
 
-## Microbiome diversity analysis
-#### DNA extraction and sequencing
 <p style="text-align: justify;">
 Nucleic acid extraction was performed using the MagMAX Microbiome Ultra Nucleic Acid Isolation Kit (Thermo Fisher Scientific, USA). Stool samples were suspended in 700 µL of phosphate-buffered saline (PBS) and homogenized using MagNA Lyser Green Beads (Roche, Switzerland) in a MagNA Lyser instrument (Roche, Switzerland). Following homogenization, samples were centrifuged at 9,000 × g for 1 minute, after which the supernatant was processed according to the manufacturer's protocol. DNA concentration was quantified using a Qubit 4 fluorometer (Thermo Fisher Scientific, USA) with the Quant-iT dsDNA BR Assay Kit (Thermo Fisher Scientific, USA). For 16S rRNA gene amplification, 1-5 ng of extracted DNA served as template using universal primers 27F (5'-AGAGTTTGATYMTGGCTCAG-3') and 1492R (5'-GGTTACCTTGTTAYGACTT-3') (Eurogen, Russia). PCR reactions were performed in 25 µL volumes with the Tersus Plus PCR kit (Eurogen, Russia) under the following conditions: initial denaturation at 95°C for 2 minutes; 27 cycles of 95°C for 1 minute, 60°C for 1 minute, and 72°C for 3 minutes; followed by final extension at 72°C for 2 minutes. PCR products were verified by electrophoresis in 1.5% agarose gels and purified using KAPA HyperPure Beads (Roche, Switzerland). Library preparation followed the ligation sequencing protocol with modifications. Amplicons were end-repaired and dA-tailed using the NEBNext Ultra II End Repair/dA-Tailing Module (NEB, USA). Barcode ligation was performed with the Native Barcoding Kit 96 (SQK-NBD109.96; Oxford Nanopore Technologies, UK) using Blunt/TA Ligase Master Mix (NEB, USA), followed by purification with KAPA Pure Beads (Roche, Switzerland). Library concentrations were determined using the Quant-iT dsDNA Assay Kit, High Sensitivity (Thermo Fisher Scientific), and samples were pooled in equimolar ratios. Final adapter ligation employed Adapter Mix II Expansion (Oxford Nanopore Technologies, UK) with the NEBNext Quick Ligation Module (NEB, USA). For nanopore sequencing, 12 µL of the prepared library was combined with 37.5 µL Sequencing Buffer and 25.5 µL Loading Beads, then loaded onto an R9.4.1 flow cell (FLO-MIN106; Oxford Nanopore Technologies). Sequencing was performed on a MinION Mk1B platform using MinKNOW software version 22.12.7 (Oxford Nanopore Technologies, UK) for data acquisition.
 <p>
@@ -64,6 +62,7 @@ library(ggrepel)
 library(RColorBrewer)
 library(lmerTest)
 library(multcomp)
+library(dplyr)
 
 library(phyloseq)
 library(microViz)
@@ -125,26 +124,28 @@ datatable(tumor.df,
 
 ## The influence of *L. rhamnosus* K32 and *B. adolescentis* 150 supplementation on B16-F10 melanoma growth
 <p style="text-align: justify;">
-At the initial study phase, we evaluated differences in tumor growth between experimental groups. The data revealed that mice in the M_BIF group showed a statistically significant increase in tumor growth compared to both the M group (adj. p = 0.02) and the M_LAC group (adj. p = 0.0007). In contrast, no significant difference was observed between the M and M_LAC groups (p = 0.40). Individual tumor growth curves for each mouse, stratified by experimental group and replicate, are presented in Figure 1.
+At the initial study phase, we evaluated differences in tumor growth between experimental groups. The data revealed that mice in the M_BIF group showed a statistically significant increase in tumor growth compared to both the M group (adj. p = 0.02) and the M_LAC group (adj. p = 0.0007). In contrast, no significant difference was observed between the M and M_LAC groups (p = 0.40). Individual tumor growth curves for each mouse, stratified by experimental group and replicate, are presented in Figure 1. Histogram of tumor sizes mixed models residuals presented in Figure 2.
 <p>
 
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-tumor_plot <- ggplot(tumor.df[tumor.df$time_point < 18,])+
-    geom_line(mapping = aes(time_point, tumor_size, group = subject_id, col = group))+
+
+tumor_mean <- tumor.df[tumor.df$time_point < 18,] %>%  
+      group_by(group, time_point, batch) %>% 
+      summarise(mean = mean(tumor_size), sd = sd(tumor_size))
+
+tumor_plot <- ggplot()+
+    geom_line(tumor.df[tumor.df$time_point < 18,], 
+              mapping = aes(time_point, tumor_size, group = subject_id, col = group), alpha = 0.25)+
+    geom_line(tumor_mean, mapping = aes(time_point, mean, col = group))+
     facet_wrap(~batch+group, nrow = 1)+
     theme_classic()+
     scale_color_manual(values = brewer.pal(n = 3, name = "Set1"))+
     theme(legend.position = "none")+
     xlab("Days post-tumor injection")+
     ylab("Tumor size, cm²")
-```
-
-```{r}
-#| include: false
-fm <- lmerTest::lmer(tumor_size ~ group + (1|batch) + (1|subject_id), data=tumor.df)
 ```
 
 ```{r fig.width=10, fig.height=3.5}
@@ -168,7 +169,41 @@ tumor_plot
 #| echo: false
 #| message: false
 #| warning: false
+fm <- lmerTest::lmer(tumor_size ~ time_point + group + (1|batch) + (1|subject_id), data=tumor.df)
+
 summary(glht(fm, linfct = mcp(group = "Tukey")), test = adjusted("bonferroni"))
+shapiro.test(residuals(fm))
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+qplot_tumor <- qplot(residuals(fm)) + 
+      xlab("Residuals") + 
+      ylab("Density") + 
+      theme_bw()
+```
+
+```{r fig.height=3.5, fig.width=5}
+#| echo: false
+#| message: false
+#| warning: false
+download_this(
+  qplot_tumor,
+  output_name = "qplot_tumor",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.height=3.5, fig.width=5}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: Figure 2. Distribution of residuals from the tumor size linear mixed model.
+qplot_tumor
 ```
 
 ## Microbiome diversity analysis
@@ -213,12 +248,12 @@ datatable(meta_data_d,
 
 #### Quality control
 <p style="text-align: justify;">
-After quality filtering with porechop and chopper, sequencing quality metrics were aggregated and summarized using `MultiQC` based on `FastQC` reports. As shown in Figure 1, the `MultiQC` quality profile demonstrated that the sequencing data maintained satisfactory overall quality. Following quality control, approximately 1,909,224 reads (mean ± SD: 24,795 ± 13,620 reads per sample) were retained for downstream analysis, with an average of 37 ± 17% of reads per sample being removed during filtering (see Table 2 for detailed statistics). Microbial genus abundance was quantified using the `Emu` pipeline with the `GTDB r202` database. The final genus abundance data are presented in Table 4. Visualization of genus distribution cross experimental groups and replicates presented in Figure 2.
+After quality filtering with porechop and chopper, sequencing quality metrics were aggregated and summarized using `MultiQC` based on `FastQC` reports. As shown in Figure 3, the `MultiQC` quality profile demonstrated that the sequencing data maintained satisfactory overall quality. Following quality control, approximately 1,909,224 reads (mean ± SD: 24,795 ± 13,620 reads per sample) were retained for downstream analysis, with an average of 37 ± 17% of reads per sample being removed during filtering (see Table 2 for detailed statistics). Microbial genus abundance was quantified using the `Emu` pipeline with the `GTDB r202` database. The final genus abundance data are presented in Table 4. Visualization of genus distribution cross experimental groups and replicates presented in Figure 4.
 <p>
 
 [MultiQC full report](multiqc_report.html)
 
-![Figure 2. Quality values across experimental samples.](figures/nanostat_quality_dist.svg)
+![Figure 3. Quality values across experimental samples.](figures/nanostat_quality_dist.svg)
 
 ```{r}
 #| echo: false
@@ -267,13 +302,13 @@ download_this(
 
 ```{r fig.width=15, fig.height=5}
 #| echo: false
-#| fig-cap: Figure 2. Genus distribution per experimental samples stratified by group and replicate.
+#| fig-cap: Figure 4. Genus distribution per experimental samples stratified by group and replicate.
 genus_barplot
 ```
 
 #### Alpha diversity
 <p style="text-align: justify;">
-Alpha diversity was assessed using the Shannon index, calculated with the `diversity` function from the R `vegan` package. Statistical analysis revealed a significant reduction in Shannon index values in the M_LAC group compared to the M group (adj. p = 0.03). No other inter group differences in alpha diversity were observed. Complete results are presented in Table 5 and visualized in Figure 3.
+Alpha diversity was assessed using the Shannon index, calculated with the `diversity` function from the R `vegan` package. Statistical analysis revealed a significant reduction in Shannon index values in the M_LAC group compared to the M group (adj. p = 0.03). No other inter group differences in alpha diversity were observed. Complete results are presented in Table 5 and visualized in Figure 5.
 <p>
 
 ```{r}
@@ -291,8 +326,6 @@ shannon_boxplot <- ggplot(alpha.df, aes(group, shannon, fill = group))+
     theme_bw()+
     theme(legend.position = "none")+
     scale_fill_brewer(palette = "Set1")
-
-lmer.shannon <- lmer(shannon ~ group + (1|batch), data=alpha.df)
 ```
 
 ```{r}
@@ -318,7 +351,7 @@ download_this(
 
 ```{r fig.width=7, fig.height=3}
 #| echo: false
-#| fig-cap: Figure 3. Shannon diversity index distribution stratified by group and replicate.
+#| fig-cap: Figure 5. Shannon diversity index distribution stratified by group and replicate.
 shannon_boxplot
 ```
 
@@ -326,12 +359,46 @@ shannon_boxplot
 #| echo: false
 #| message: false
 #| warning: false
+lmer.shannon <- lmer(shannon ~ time_point + group + (1|batch), data=alpha.df)
+
 summary(glht(lmer.shannon, linfct = mcp(group = "Tukey")), test = adjusted("bonferroni"))
+shapiro.test(residuals(lmer.shannon))
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+qplot_alpha <- qplot(residuals(lmer.shannon)) + 
+      xlab("Residuals") + 
+      ylab("Density") + 
+      theme_bw()
+```
+
+```{r fig.height=3.5, fig.width=5}
+#| echo: false
+#| message: false
+#| warning: false
+download_this(
+  qplot_alpha,
+  output_name = "qplot_alpha",
+  output_extension = ".pdf",
+  button_label = "PDF",
+  button_type = "primary"
+)
+```
+
+```{r fig.height=3.5, fig.width=5}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: Figure 6. Distribution of residuals from the alpha diversity linear mixed model.
+qplot_alpha
 ```
 
 #### Beta diversity
 <p style="text-align: justify;">
-Beta diversity was assessed using Bray-Curtis dissimilarity. The resulting community composition patterns were visualized through non-metric multidimensional scaling (NMDS), as shown in Figure 4, with corresponding sample metadata presented in Table 6. Permutational multivariate analysis of variance (PERMANOVA) revealed statistically significant associations between microbial community structure and batch effects (p \< 0.05), but not with experimental groups.
+Beta diversity was assessed using Bray-Curtis dissimilarity. The resulting community composition patterns were visualized through non-metric multidimensional scaling (NMDS), as shown in Figure 7, with corresponding sample metadata presented in Table 6. Permutational multivariate analysis of variance (PERMANOVA) revealed statistically significant associations between microbial community structure and batch effects (p < 0.05), but not with experimental groups.
 <p>
 
 ```{r}
@@ -373,7 +440,7 @@ download_this(
 
 ```{r fig.width=6, fig.height=5}
 #| echo: false
-#| fig-cap: Figure 4. Bi-dimentional visualization of microbiome strcutrure at genus level using non-metric multidimentional scaling and Bray-Curtis dissimilarity.
+#| fig-cap: Figure 7. Bi-dimentional visualization of microbiome strcutrure at genus level using non-metric multidimentional scaling and Bray-Curtis dissimilarity.
 mds_plot
 ```
 
@@ -381,12 +448,12 @@ mds_plot
 #| echo: false
 #| message: false
 #| warning: false
-adonis2(otu_table ~ batch + group, data = meta_data, permutations = 9999, by = "margin")
+adonis2(otu_table ~ batch + time_point + group, data = meta_data, permutations = 9999, by = "margin")
 ```
 
 #### Differential abundance testing
 <p style="text-align: justify;">
-Differential abundance analysis was performed using `MaAsLin2` with default parameters. Compared to the M group (melanoma-only controls), the M_BIF group showed significant upregulation of CAG-594, *Caprobacter*, *Lachnotalea*, and *Klebsiella* genera, while *Muricomes*, *CAG-180*, *Intestinimonas*, *Holdemania*, and *Zag111* were downregulated. In the M_LAC group, *Klebsiella* was upregulated relative to controls, while multiple genera including *CAG-594*, *Lawsonibacter*, *UBA7182*, *Blautia*, *UBA3282*, *Paramuribaculum*, *Phocaeicola*, *Dorea_B*, *Flavonifractor*, *Dubosiella*, *Mailhella*, *UMGS1872*, *UBA3263*, *Lachnoclostridium*, and *UBA7057* were downregulated. Direct comparison between M_BIF and M_LAC groups revealed distinct microbial signatures: *CAG-594*, *Blautia*, *Paramuribaculum*, *UBA7057*, and *Marseille-P3106* were associated with M_BIF, whereas *Akkermansia*, *CAG-180*, and *Zag111* were linked to M_LAC. Complete results are presented in Tables 7–9 and Figures 5–7.
+Differential abundance analysis was performed using `MaAsLin2` with default parameters. Compared to the M group (melanoma-only controls), the M_BIF group showed significant upregulation of CAG-594, *Caprobacter*, *Lachnotalea*, and *Klebsiella* genera, while *Muricomes*, *CAG-180*, *Intestinimonas*, *Holdemania*, and *Zag111* were downregulated. In the M_LAC group, *Klebsiella* was upregulated relative to controls, while multiple genera including *CAG-594*, *Lawsonibacter*, *UBA7182*, *Blautia*, *UBA3282*, *Paramuribaculum*, *Phocaeicola*, *Dorea_B*, *Flavonifractor*, *Dubosiella*, *Mailhella*, *UMGS1872*, *UBA3263*, *Lachnoclostridium*, and *UBA7057* were downregulated. Direct comparison between M_BIF and M_LAC groups revealed distinct microbial signatures: *CAG-594*, *Blautia*, *Paramuribaculum*, *UBA7057*, and *Marseille-P3106* were associated with M_BIF, whereas *Akkermansia*, *CAG-180*, and *Zag111* were linked to M_LAC. Complete results are presented in Tables 7–9 and Figures 8–10.
 <p>
 
 ```{r}
@@ -482,7 +549,7 @@ volcano_BIF_LAC <- ggplot(res_2.df, aes(x = coef, y = -log10(qval), label = genu
 ```{r}
 #| echo: false
 datatable(res.df_BIF, 
-          caption = "Table7. Differences between M_BIF and M groups.",
+          caption = "Table 7. Differences between M_BIF and M groups.",
           style = "bootstrap5", 
           extensions = 'Buttons', 
           options = list(dom = 'lBfrtip',
@@ -502,7 +569,7 @@ download_this(
 
 ```{r fig.width=6, fig.height=5}
 #| echo: false
-#| fig-cap: Figure 5. Differences between M_BIF and M groups.
+#| fig-cap: Figure 8. Differences between M_BIF and M groups.
 volcano_BIF
 ```
 
@@ -530,7 +597,7 @@ download_this(
 
 ```{r fig.width=6, fig.height=5}
 #| echo: false
-#| fig-cap: Figure 6. Differences between M_LAC and M groups.
+#| fig-cap: Figure 9. Differences between M_LAC and M groups.
 volcano_LAC
 ```
 
@@ -558,6 +625,6 @@ download_this(
 
 ```{r fig.width=6, fig.height=5}
 #| echo: false
-#| fig-cap: Figure 7. Differences between M_BIF and M_LAC groups.
+#| fig-cap: Figure 10. Differences between M_BIF and M_LAC groups.
 volcano_BIF_LAC
 ```
