@@ -1,4 +1,4 @@
-# Gut Microbiome Modulation in Model Melanoma-Bearing Mice by Probiotic Intervention
+# Gut microbiome modulation in model melanoma-bearing mice by probiotic intervention
 
 ## Overview
 
